@@ -1,0 +1,37 @@
+appName: hive-sample
+namespace: default
+replicaCount: 1
+
+image:
+  region: europe-west1-docker.pkg.dev
+  project: hive-test-gcp
+  repository: hive-test-gcp
+  tag: latest
+
+service:
+  type: LoadBalancer
+  servicePort: 80
+  targetPort: 8080
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 500Mi
+  requests:
+    cpu: 250m
+    memory: 500Mi
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 90

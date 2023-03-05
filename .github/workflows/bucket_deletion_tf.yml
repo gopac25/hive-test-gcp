@@ -26,4 +26,4 @@ jobs:
       - name: Apply to environment 
         run: |
           cd terraform/bucket
-          terraform destroy -auto-approve tfapply
+          terraform destroy -auto-approve

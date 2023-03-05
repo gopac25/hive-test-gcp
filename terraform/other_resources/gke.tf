@@ -18,16 +18,13 @@ resource "google_container_cluster" "hive-test-gke" {
     }
   }
 
-  # Enable Autopilot for this cluster
-  enable_autopilot = true
+  enable_autopilot = true  # Enable Autopilot for this cluster
 
-  # Configuration of cluster IP allocation for VPC-native clusters
   ip_allocation_policy {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
   }
 
-  # Configuration options for the Release channel feature, which provide more control over automatic upgrades of your GKE clusters.
   release_channel {
     channel = "REGULAR"
   }

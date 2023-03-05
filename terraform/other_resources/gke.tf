@@ -2,7 +2,7 @@ resource "google_container_cluster" "hive-test-gke" {
   name                     = var.gke_cluster_name
   location                 = var.region
   network                  = var.vpc_name
-  subnetwork               = var.subnetwork
+  subnetwork               = var.subnet_name
 
   private_cluster_config {
     enable_private_endpoint = false

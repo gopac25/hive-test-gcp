@@ -26,6 +26,6 @@ jobs:
           terraform plan -out tfapply
 
       - name: Apply to environment 
-        run: 
+        run: |
           cd terraform
           terraform apply -auto-approve tfapply

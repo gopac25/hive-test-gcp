@@ -19,6 +19,11 @@ description = "Google VPC name"
 type        = string
 }
 
+variable "subnet_name" {
+description = "Google Subnet name"
+type        = string
+}
+
 variable "subnet_ip_addr" {
 description = "Subnet IP Addr"
 type        = string
@@ -32,4 +37,14 @@ type        = string
 variable "pod_ip_range" {
 description = "K8s Pods IP Range"
 type        = string
+}
+
+variable "gke_cluster_name" {
+description = "GKE Cluster Name"
+type        = string
+}
+
+variable "gke_master_ipv4_cidr_block" {
+  type    = string
+  default = "172.18.0.0/28"
 }

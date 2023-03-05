@@ -5,7 +5,7 @@ resource "google_compute_network" "hive-vpc" {
 }
 
 resource "google_compute_subnetwork" "k8s-sub" {
-  name          = "kubernetes-sub"
+  name          = var.subnet_name
   ip_cidr_range = var.subnet_ip_addr
   network       = google_compute_network.hive-vpc.id
   region        = var.region

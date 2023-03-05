@@ -1,0 +1,84 @@
+name: CICD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'terraform/other_resources/**'
+      - 'terraform/bucket/**'
+
+env:
+  project_id: hive-test-gcp
+  artifact_repo: hive-test-gcp
+  gcp_region: europe-west1
+  gke_cluster: hive-test-gke
+  gke_namespace: default
+  app_name: hive-sample
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: docker build -t $app_name:latest .
+
+      - name: Verify Docker Image
+        run: docker images | grep -i $app_name
+
+      - name: Tag Docker Image
+        run: docker tag $app_name:latest europe-west1-docker.pkg.dev/$project_id/$artifact_repo/$app_name:latest
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - run: mkdir -p "$HOME/.docker"
+      - run: gcloud auth configure-docker --quiet $gcp_region-docker.pkg.dev
+
+      - name: Push image to gcp
+        run: docker push $gcp_region-docker.pkg.dev/$project_id/$artifact_repo/$app_name:latest
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Connecting to GKE Cluster
+        run: |
+          gcloud container clusters get-credentials $gke_cluster --region $gcp_region --project $project_id
+
+      - name: Deploy to gcloud
+        run: |
+          if [ `kubectl get deployment $app_name -n $gke_namespace| grep -i $app_name|awk '{ print $4}'` > 1 ]
+          then
+            echo "Deployment Already Exist..."
+            kubectl rollout restart deployment/$app_name -n $gke_namespace
+          elif [ "`helm list -n $gke_namespace | grep "$app_name" | awk '{ print $1}'`" == "$app_name" ]
+          then
+            echo "Upgrade helm Deployment"
+            helm upgrade $app_name ./helm -f helm/values.yaml -n $gke_namespace
+          else
+            echo "Creating New Deployment"
+            helm install $app_name ./helm -f helm/values.yaml -n $gke_namespace
+          fi
+
+      - name: Verify Deployment Status
+        run: |
+          if [ "`kubectl rollout status -w deployment/$app_name -n $gke_namespace | grep successfully| awk '{ print $3 }'`" == "successfully" ]
+          then
+            echo "Deployment Completed Successfully"
+          else
+            echo "Deployment Failed"
+            exit 1
+          fi

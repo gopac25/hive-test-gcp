@@ -2,10 +2,7 @@ name: Infra Provisioning Terraform
 
 on:
   push:
-    paths:
-      - 'terraform/**'
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   provision:
@@ -13,7 +10,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-		
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
@@ -21,13 +18,13 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
-		  
+
       - name: Initialize terraform & Plan
         run: |
           cd terraform
           terraform init -input=false
           terraform plan -out tfapply
-		  
+
       - name: Apply to environment 
         run: 
           cd terraform

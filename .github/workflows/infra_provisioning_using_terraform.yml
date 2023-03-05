@@ -1,0 +1,34 @@
+name: Infra Provisioning Terraform
+
+on:
+  push:
+    paths:
+      - 'terraform/**'
+    branches:
+      - main
+
+jobs:
+  provision:
+    runs-on: hydra-deployer   
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+		
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+		  
+      - name: Initialize terraform & Plan
+        run: |
+          cd terraform
+          terraform init -input=false
+          terraform plan -out tfapply
+		  
+      - name: Apply to environment 
+        run: 
+          cd terraform
+          terraform apply -auto-approve tfapply

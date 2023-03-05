@@ -18,6 +18,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Initialize terraform
+        run: |
+          cd terraform/other_resources
+          terraform init -input=false
+
       - name: Destroy the environment 
         run: |
           cd terraform/other_resources

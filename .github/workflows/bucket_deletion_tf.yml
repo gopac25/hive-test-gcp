@@ -18,6 +18,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Initialize terraform
+        run: |
+          cd terraform/bucket
+          terraform init -input=false
+
       - name: Apply to environment 
         run: |
           cd terraform/bucket

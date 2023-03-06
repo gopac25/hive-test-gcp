@@ -29,7 +29,7 @@ jobs:
         run: docker images | grep -i $app_name
 
       - name: Tag Docker Image
-        run: docker tag $app_name:latest europe-west1-docker.pkg.dev/$project_id/$artifact_repo/$app_name:latest
+        run: docker tag $app_name:latest $gcp_region-docker.pkg.dev/$project_id/$artifact_repo/$app_name:latest
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
@@ -54,11 +54,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - id: 'get-credentials'
-        uses: 'google-github-actions/get-gke-credentials@v1'
+      - id: get-credentials
+        uses: google-github-actions/get-gke-credentials@v1
         with:
-          cluster_name: '$gke_cluster'
-          location: '$gcp_region'
+          cluster_name: $gke_cluster
+          location: $gcp_region
 
       - name: Deploy to gcloud
         run: |

@@ -57,8 +57,8 @@ jobs:
       - id: get-credentials
         uses: google-github-actions/get-gke-credentials@v1
         with:
-          cluster_name: $gke_cluster
-          location: $gcp_region
+          cluster_name: hive-test-gke
+          location: europe-west1
 
       - name: Deploy to gcloud
         run: |

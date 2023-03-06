@@ -54,9 +54,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Connecting to GKE Cluster
-        run: |
-          gcloud container clusters get-credentials $gke_cluster --region $gcp_region --project $project_id
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: '$gke_cluster'
+          location: '$gcp_region'
 
       - name: Deploy to gcloud
         run: |

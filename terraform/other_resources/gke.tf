@@ -29,4 +29,6 @@ resource "google_container_cluster" "hive-test-gke" {
   release_channel {
     channel = "REGULAR"
   }
+  
+  depends_on = [google_compute_network.hive-vpc, google_compute_subnetwork.k8s-sub]
 }
